@@ -128,7 +128,7 @@ export default function ChatPage({ userId, userName, onSignOut }: ChatPageProps)
               <img
                 src="/the-living-word/tanaor-logo.png"
                 alt="Tanaor"
-                className="h-5 opacity-70 mb-0.5"
+                className="h-5 mb-0.5"
               />
               <h1 className="font-serif text-amber-900 text-sm leading-tight">The Living Word</h1>
             </div>
