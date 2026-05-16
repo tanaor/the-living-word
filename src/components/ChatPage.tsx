@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useConversation } from "../hooks/useConversation";
 import { useChat } from "../hooks/useChat";
+import { useDailyVerse } from "../hooks/useDailyVerse";
 import MessageBubble from "./MessageBubble";
 import ChatInput from "./ChatInput";
 import LoadingDots from "./LoadingDots";
 import ConversationList from "./ConversationList";
+import DailyVerseCard from "./DailyVerseCard";
 import { buildSystemPrompt } from "../prompts/system-prompt";
 import { sendChatMessage } from "../lib/gemini";
 
@@ -36,6 +38,8 @@ export default function ChatPage({ userId, userName, onSignOut }: ChatPageProps)
     addMessage,
     nameConversation,
   });
+
+  const { verse, loading: verseLoading } = useDailyVerse(userId, userContext);
 
   const [showSidebar, setShowSidebar] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -140,6 +144,8 @@ export default function ChatPage({ userId, userName, onSignOut }: ChatPageProps)
             Sign out
           </button>
         </div>
+
+        <DailyVerseCard verse={verse} loading={verseLoading} />
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto px-4 py-6">
