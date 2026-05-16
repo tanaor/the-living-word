@@ -34,7 +34,8 @@ export function useChat({
     setSending(true);
 
     try {
-      const isNewConversation = !activeConversationId;
+      // First message if the conversation has no messages yet
+      const isFirstMessage = messages.length === 0;
       let convId = activeConversationId;
       if (!convId) {
         convId = await createConversation();
@@ -43,7 +44,7 @@ export function useChat({
       await addMessage(convId, "user", userMessage);
 
       // Name immediately so sidebar updates at once — AI refines it after response
-      if (isNewConversation) {
+      if (isFirstMessage) {
         nameConversation(convId, userMessage, "");
       }
 
@@ -59,7 +60,7 @@ export function useChat({
       await addMessage(convId, "assistant", aiResponse);
 
       // Silently upgrade to AI-generated title in background
-      if (isNewConversation) {
+      if (isFirstMessage) {
         nameConversation(convId, userMessage, aiResponse);
       }
     } catch (err) {
