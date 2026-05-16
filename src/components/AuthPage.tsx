@@ -38,7 +38,7 @@ export default function AuthPage({ onSignUp, onSignIn }: AuthPageProps) {
           <img
             src="/the-living-word/tanaor-logo.png"
             alt="Tanaor"
-            className="h-10 mx-auto mb-6"
+            className="h-10 mx-auto mb-6" style={{ filter: "brightness(0.55)" }}
           />
           <h1 className="text-3xl font-serif text-amber-900 mb-2">
             The Living Word
