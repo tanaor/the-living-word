@@ -92,8 +92,34 @@ export function useConversation(userId: string) {
     return data;
   }
 
-  async function nameConversation(conversationId: string, firstUserMessage: string) {
-    const title = firstUserMessage.trim().slice(0, 40) + (firstUserMessage.trim().length > 40 ? "…" : "");
+  async function nameConversation(conversationId: string, userMessage: string, aiResponse: string) {
+    const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+    const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+    let title = userMessage.trim().slice(0, 35);
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+          "apikey": SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: "user", content: userMessage },
+            { role: "assistant", content: aiResponse },
+          ],
+          systemPrompt: `Give this conversation a short title (3-5 words max). Capture the topic or emotion — like "Anxiety about new job" or "Finding peace in grief" or "Understanding Psalm 23". Reply with ONLY the title, no quotes, no punctuation at the end.`,
+        }),
+      });
+      const data = await res.json();
+      if (data.message) title = data.message.trim().slice(0, 50);
+    } catch {
+      // fall back to truncated user message
+    }
+
     await supabase
       .from("conversations")
       .update({ title })

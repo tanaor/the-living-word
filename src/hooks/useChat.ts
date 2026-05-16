@@ -14,7 +14,7 @@ interface UseChatParams {
     role: "user" | "assistant",
     content: string
   ) => Promise<Message>;
-  nameConversation: (conversationId: string, firstUserMessage: string) => Promise<void>;
+  nameConversation: (conversationId: string, userMessage: string, aiResponse: string) => Promise<void>;
 }
 
 export function useChat({
@@ -42,10 +42,6 @@ export function useChat({
 
       await addMessage(convId, "user", userMessage);
 
-      if (isNewConversation) {
-        nameConversation(convId, userMessage);
-      }
-
       const systemPrompt = buildSystemPrompt(userName, userContext ?? undefined);
 
       const chatHistory = [
@@ -56,6 +52,10 @@ export function useChat({
       const aiResponse = await sendChatMessage(chatHistory, systemPrompt);
 
       await addMessage(convId, "assistant", aiResponse);
+
+      if (isNewConversation) {
+        nameConversation(convId, userMessage, aiResponse);
+      }
     } catch (err) {
       console.error("Chat error:", err);
       const convId = activeConversationId;
