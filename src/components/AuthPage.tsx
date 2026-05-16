@@ -35,6 +35,11 @@ export default function AuthPage({ onSignUp, onSignIn }: AuthPageProps) {
     <div className="min-h-screen bg-amber-50 flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
+          <img
+            src="/the-living-word/tanaor-logo.png"
+            alt="Tanaor"
+            className="h-10 mx-auto mb-6 opacity-80"
+          />
           <h1 className="text-3xl font-serif text-amber-900 mb-2">
             The Living Word
           </h1>

@@ -124,7 +124,14 @@ export default function ChatPage({ userId, userName, onSignOut }: ChatPageProps)
                 <path fillRule="evenodd" d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75Zm0 10.5a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1-.75-.75ZM2 10a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 2 10Z" clipRule="evenodd" />
               </svg>
             </button>
-            <h1 className="font-serif text-amber-900 text-lg">The Living Word</h1>
+            <div className="flex flex-col items-center">
+              <img
+                src="/the-living-word/tanaor-logo.png"
+                alt="Tanaor"
+                className="h-5 opacity-70 mb-0.5"
+              />
+              <h1 className="font-serif text-amber-900 text-sm leading-tight">The Living Word</h1>
+            </div>
           </div>
           <button
             onClick={onSignOut}
