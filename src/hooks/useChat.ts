@@ -8,13 +8,13 @@ interface UseChatParams {
   userContext: UserContext | null;
   messages: Message[];
   activeConversationId: string | null;
-  createConversation: () => Promise<string>;
+  createConversation: (isPrayer?: boolean) => Promise<string>;
   addMessage: (
     conversationId: string,
     role: "user" | "assistant",
     content: string
   ) => Promise<Message>;
-  nameConversation: (conversationId: string, userMessage: string, aiResponse: string) => Promise<void>;
+  nameConversation: (conversationId: string, userMessage: string) => Promise<void>;
 }
 
 export function useChat({
@@ -28,24 +28,23 @@ export function useChat({
 }: UseChatParams) {
   const [sending, setSending] = useState(false);
 
-  async function send(userMessage: string) {
+  async function send(userMessage: string, isPrayer = false) {
     if (!userMessage.trim() || sending) return;
 
     setSending(true);
 
     try {
-      // First message if the conversation has no messages yet
       const isFirstMessage = messages.length === 0;
       let convId = activeConversationId;
       if (!convId) {
-        convId = await createConversation();
+        convId = await createConversation(isPrayer);
       }
 
       await addMessage(convId, "user", userMessage);
 
-      // Name immediately so sidebar updates at once — AI refines it after response
+      // Name immediately from the user's own words
       if (isFirstMessage) {
-        nameConversation(convId, userMessage, "");
+        nameConversation(convId, userMessage);
       }
 
       const systemPrompt = buildSystemPrompt(userName, userContext ?? undefined);
@@ -58,11 +57,6 @@ export function useChat({
       const aiResponse = await sendChatMessage(chatHistory, systemPrompt);
 
       await addMessage(convId, "assistant", aiResponse);
-
-      // Silently upgrade to AI-generated title in background
-      if (isFirstMessage) {
-        nameConversation(convId, userMessage, aiResponse);
-      }
     } catch (err) {
       console.error("Chat error:", err);
       const convId = activeConversationId;

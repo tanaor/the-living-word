@@ -103,9 +103,10 @@ export default function ChatPage({ userId, userName, onSignOut }: ChatPageProps)
             await createConversation();
             setShowSidebar(false);
           }}
-          onPray={() => {
+          onPray={async () => {
             setShowSidebar(false);
-            send("I'd like to pray with you");
+            await createConversation(true);
+            send("I'd like to pray with you", true);
           }}
           onClose={() => setShowSidebar(false)}
         />

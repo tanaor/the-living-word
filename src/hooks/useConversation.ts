@@ -54,10 +54,10 @@ export function useConversation(userId: string) {
     setUserContext(data);
   }
 
-  async function createConversation(): Promise<string> {
+  async function createConversation(isPrayer = false): Promise<string> {
     const { data, error } = await supabase
       .from("conversations")
-      .insert({ user_id: userId })
+      .insert({ user_id: userId, is_prayer: isPrayer })
       .select()
       .single();
 
@@ -92,49 +92,15 @@ export function useConversation(userId: string) {
     return data;
   }
 
-  async function nameConversation(conversationId: string, userMessage: string, aiResponse: string) {
-    const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-    const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-    // Immediate title from user message — capitalize and trim cleanly at word boundary
+  async function nameConversation(conversationId: string, userMessage: string) {
+    // Title = first ~38 chars of user message, trimmed cleanly at word boundary
     const words = userMessage.trim().split(" ");
-    let immediate = "";
+    let title = "";
     for (const word of words) {
-      if ((immediate + " " + word).trim().length > 38) break;
-      immediate = (immediate + " " + word).trim();
+      if ((title + " " + word).trim().length > 38) break;
+      title = (title + " " + word).trim();
     }
-    const immediateTitle = immediate.charAt(0).toUpperCase() + immediate.slice(1);
-
-    // If no AI response yet, just set the immediate title and return
-    if (!aiResponse) {
-      await supabase.from("conversations").update({ title: immediateTitle }).eq("id", conversationId);
-      setConversations((prev) => prev.map((c) => (c.id === conversationId ? { ...c, title: immediateTitle } : c)));
-      return;
-    }
-
-    // With AI response, generate a proper topic title in background
-    let title = immediateTitle;
-    try {
-      const res = await fetch(`${SUPABASE_URL}/functions/v1/chat`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-          "apikey": SUPABASE_ANON_KEY,
-        },
-        body: JSON.stringify({
-          messages: [
-            { role: "user", content: userMessage },
-            { role: "assistant", content: aiResponse },
-          ],
-          systemPrompt: `Give this conversation a short title (3-5 words max). Capture the topic or emotion — like "Anxiety about new job" or "Finding peace in grief" or "Understanding Psalm 23". Reply with ONLY the title, no quotes, no punctuation at the end.`,
-        }),
-      });
-      const data = await res.json();
-      if (data.message) title = data.message.trim().slice(0, 50);
-    } catch {
-      // keep immediate title
-    }
+    title = title.charAt(0).toUpperCase() + title.slice(1);
 
     await supabase.from("conversations").update({ title }).eq("id", conversationId);
     setConversations((prev) => prev.map((c) => (c.id === conversationId ? { ...c, title } : c)));

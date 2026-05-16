@@ -51,13 +51,18 @@ export default function ConversationList({
           <button
             key={conv.id}
             onClick={() => onSelect(conv.id)}
-            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-              conv.id === activeId
-                ? "bg-amber-200 text-amber-900"
-                : "text-amber-700 hover:bg-amber-100"
+            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 ${
+              conv.is_prayer
+                ? conv.id === activeId
+                  ? "bg-violet-200 text-violet-900"
+                  : "text-violet-700 hover:bg-violet-100"
+                : conv.id === activeId
+                  ? "bg-amber-200 text-amber-900"
+                  : "text-amber-700 hover:bg-amber-100"
             }`}
           >
-            {conv.title}
+            {conv.is_prayer && <span className="text-xs">🙏</span>}
+            <span className="truncate">{conv.title}</span>
           </button>
         ))}
       </div>
