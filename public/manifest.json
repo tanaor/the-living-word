@@ -1,0 +1,21 @@
+{
+  "name": "The Living Word",
+  "short_name": "Living Word",
+  "description": "A friend for every season of your faith.",
+  "start_url": "/the-living-word/",
+  "display": "standalone",
+  "background_color": "#fffbeb",
+  "theme_color": "#92400e",
+  "icons": [
+    {
+      "src": "/the-living-word/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/the-living-word/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
