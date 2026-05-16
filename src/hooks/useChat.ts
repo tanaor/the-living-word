@@ -42,6 +42,11 @@ export function useChat({
 
       await addMessage(convId, "user", userMessage);
 
+      // Name immediately so sidebar updates at once — AI refines it after response
+      if (isNewConversation) {
+        nameConversation(convId, userMessage, "");
+      }
+
       const systemPrompt = buildSystemPrompt(userName, userContext ?? undefined);
 
       const chatHistory = [
@@ -53,6 +58,7 @@ export function useChat({
 
       await addMessage(convId, "assistant", aiResponse);
 
+      // Silently upgrade to AI-generated title in background
       if (isNewConversation) {
         nameConversation(convId, userMessage, aiResponse);
       }

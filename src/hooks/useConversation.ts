@@ -96,8 +96,24 @@ export function useConversation(userId: string) {
     const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
     const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-    let title = userMessage.trim().slice(0, 35);
+    // Immediate title from user message — capitalize and trim cleanly at word boundary
+    const words = userMessage.trim().split(" ");
+    let immediate = "";
+    for (const word of words) {
+      if ((immediate + " " + word).trim().length > 38) break;
+      immediate = (immediate + " " + word).trim();
+    }
+    const immediateTitle = immediate.charAt(0).toUpperCase() + immediate.slice(1);
 
+    // If no AI response yet, just set the immediate title and return
+    if (!aiResponse) {
+      await supabase.from("conversations").update({ title: immediateTitle }).eq("id", conversationId);
+      setConversations((prev) => prev.map((c) => (c.id === conversationId ? { ...c, title: immediateTitle } : c)));
+      return;
+    }
+
+    // With AI response, generate a proper topic title in background
+    let title = immediateTitle;
     try {
       const res = await fetch(`${SUPABASE_URL}/functions/v1/chat`, {
         method: "POST",
@@ -117,17 +133,11 @@ export function useConversation(userId: string) {
       const data = await res.json();
       if (data.message) title = data.message.trim().slice(0, 50);
     } catch {
-      // fall back to truncated user message
+      // keep immediate title
     }
 
-    await supabase
-      .from("conversations")
-      .update({ title })
-      .eq("id", conversationId);
-
-    setConversations((prev) =>
-      prev.map((c) => (c.id === conversationId ? { ...c, title } : c))
-    );
+    await supabase.from("conversations").update({ title }).eq("id", conversationId);
+    setConversations((prev) => prev.map((c) => (c.id === conversationId ? { ...c, title } : c)));
   }
 
   async function updateUserContext(context: Partial<UserContext>) {
