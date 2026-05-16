@@ -151,13 +151,21 @@ export default function ChatPage({ userId, userName, onSignOut }: ChatPageProps)
         <div className="flex-1 overflow-y-auto px-4 py-6">
           <div className="max-w-2xl mx-auto">
             {messages.length === 0 && !sending && (
-              <div className="text-center py-16">
+              <div className="text-center py-12">
                 <p className="text-amber-700 font-serif text-xl mb-2">
                   Welcome, {userName}
                 </p>
-                <p className="text-amber-500 text-sm">
+                <p className="text-amber-500 text-sm mb-8">
                   Share what's on your heart. I'm here for you.
                 </p>
+                <button
+                  onClick={() => send("I'd like to pray with you")}
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-full
+                             bg-amber-700 text-white text-sm font-medium
+                             hover:bg-amber-800 active:scale-95 transition-all shadow-md"
+                >
+                  🙏 Pray with me
+                </button>
               </div>
             )}
 
@@ -178,6 +186,21 @@ export default function ChatPage({ userId, userName, onSignOut }: ChatPageProps)
             <div ref={messagesEndRef} />
           </div>
         </div>
+
+        {/* Quick actions */}
+        {messages.length > 0 && (
+          <div className="px-4 pb-2 flex gap-2">
+            <button
+              onClick={() => send("I'd like to pray with you")}
+              disabled={sending}
+              className="text-xs px-3 py-1.5 rounded-full border border-amber-300
+                         text-amber-700 hover:bg-amber-100 active:scale-95
+                         transition-all disabled:opacity-40"
+            >
+              🙏 Pray with me
+            </button>
+          </div>
+        )}
 
         {/* Input */}
         <ChatInput onSend={send} disabled={sending} />
