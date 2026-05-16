@@ -103,6 +103,10 @@ export default function ChatPage({ userId, userName, onSignOut }: ChatPageProps)
             await createConversation();
             setShowSidebar(false);
           }}
+          onPray={() => {
+            setShowSidebar(false);
+            send("I'd like to pray with you");
+          }}
           onClose={() => setShowSidebar(false)}
         />
       </div>
@@ -186,21 +190,6 @@ export default function ChatPage({ userId, userName, onSignOut }: ChatPageProps)
             <div ref={messagesEndRef} />
           </div>
         </div>
-
-        {/* Quick actions */}
-        {messages.length > 0 && (
-          <div className="px-4 pb-2 flex gap-2">
-            <button
-              onClick={() => send("I'd like to pray with you")}
-              disabled={sending}
-              className="text-xs px-3 py-1.5 rounded-full border border-amber-300
-                         text-amber-700 hover:bg-amber-100 active:scale-95
-                         transition-all disabled:opacity-40"
-            >
-              🙏 Pray with me
-            </button>
-          </div>
-        )}
 
         {/* Input */}
         <ChatInput onSend={send} disabled={sending} />
