@@ -134,7 +134,7 @@ export default function ChatPage({ userId, userName, onSignOut }: ChatPageProps)
             </button>
             <div className="flex flex-col items-center">
               <img
-                src="/the-living-word/tanaor-logo.png"
+                src="/tanaor-logo.png"
                 alt="Tanaor"
                 className="h-5 mb-0.5" style={{ filter: "brightness(0.55)" }}
               />
