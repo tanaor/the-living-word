@@ -103,9 +103,8 @@ export default function ChatPage({ userId, userName, onSignOut }: ChatPageProps)
             await createConversation();
             setShowSidebar(false);
           }}
-          onPray={async () => {
+          onPray={() => {
             setShowSidebar(false);
-            await createConversation(true);
             send("I'd like to pray with you", true);
           }}
           onClose={() => setShowSidebar(false)}
@@ -164,7 +163,7 @@ export default function ChatPage({ userId, userName, onSignOut }: ChatPageProps)
                   Share what's on your heart. I'm here for you.
                 </p>
                 <button
-                  onClick={() => send("I'd like to pray with you")}
+                  onClick={() => send("I'd like to pray with you", true)}
                   className="inline-flex items-center gap-2 px-5 py-3 rounded-full
                              bg-amber-700 text-white text-sm font-medium
                              hover:bg-amber-800 active:scale-95 transition-all shadow-md"
