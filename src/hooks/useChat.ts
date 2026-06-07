@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { sendChatMessage } from "../lib/gemini";
 import { buildSystemPrompt } from "../prompts/system-prompt";
+import { extractMemory } from "../lib/responseFormat";
 import type { Message, UserContext } from "../lib/types";
 
 interface UseChatParams {
@@ -15,6 +16,7 @@ interface UseChatParams {
     content: string
   ) => Promise<Message>;
   nameConversation: (conversationId: string, userMessage: string) => Promise<void>;
+  updateUserContext: (context: Partial<UserContext>) => Promise<void>;
 }
 
 export function useChat({
@@ -25,6 +27,7 @@ export function useChat({
   createConversation,
   addMessage,
   nameConversation,
+  updateUserContext,
 }: UseChatParams) {
   const [sending, setSending] = useState(false);
 
@@ -62,7 +65,19 @@ export function useChat({
       ];
 
       const aiResponse = await sendChatMessage(chatHistory, systemPrompt);
-      await addMessage(convId, "assistant", aiResponse);
+
+      // Pull any durable facts the AI learned and persist them to user_context,
+      // then strip the [MEMORY] block so it is never shown or re-applied.
+      const { cleaned, memory } = extractMemory(aiResponse);
+      if (memory) {
+        await updateUserContext({
+          ...(memory.life_season ? { life_season: memory.life_season } : {}),
+          ...(memory.faith_journey ? { faith_journey: memory.faith_journey } : {}),
+          ...(memory.key_topics ? { key_topics: memory.key_topics } : {}),
+        });
+      }
+
+      await addMessage(convId, "assistant", cleaned);
     } catch (err) {
       console.error("Chat error:", err);
       if (convId) {

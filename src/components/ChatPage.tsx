@@ -27,6 +27,7 @@ export default function ChatPage({ userId, userName, onSignOut }: ChatPageProps)
     createConversation,
     addMessage,
     nameConversation,
+    updateUserContext,
   } = useConversation(userId);
 
   const { send, sending } = useChat({
@@ -37,6 +38,7 @@ export default function ChatPage({ userId, userName, onSignOut }: ChatPageProps)
     createConversation,
     addMessage,
     nameConversation,
+    updateUserContext,
   });
 
   const { verse, loading: verseLoading } = useDailyVerse(userId, userContext);
