@@ -3,9 +3,19 @@ import { useAuth } from "./hooks/useAuth";
 import { supabase } from "./lib/supabase";
 import AuthPage from "./components/AuthPage";
 import ChatPage from "./components/ChatPage";
+import SetNewPasswordPage from "./components/SetNewPasswordPage";
 
 export default function App() {
-  const { session, loading, signUp, signIn, signOut } = useAuth();
+  const {
+    session,
+    loading,
+    isRecovery,
+    signUp,
+    signIn,
+    signOut,
+    resetPassword,
+    updatePassword,
+  } = useAuth();
   const [userName, setUserName] = useState<string>("");
   const [profileLoading, setProfileLoading] = useState(false);
 
@@ -26,6 +36,16 @@ export default function App() {
     }
   }, [session]);
 
+  if (isRecovery) {
+    return (
+      <SetNewPasswordPage
+        onUpdatePassword={async (password) => {
+          await updatePassword(password);
+        }}
+      />
+    );
+  }
+
   if (loading || profileLoading) {
     return (
       <div className="min-h-screen bg-amber-50 flex items-center justify-center">
@@ -42,6 +62,9 @@ export default function App() {
         }}
         onSignIn={async (email, password) => {
           await signIn(email, password);
+        }}
+        onResetPassword={async (email) => {
+          await resetPassword(email);
         }}
       />
     );
