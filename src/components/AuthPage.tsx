@@ -36,7 +36,7 @@ export default function AuthPage({ onSignUp, onSignIn }: AuthPageProps) {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <img
-            src="/the-living-word/tanaor-logo.png"
+            src="/tanaor-logo.png"
             alt="Tanaor"
             className="h-10 mx-auto mb-6" style={{ filter: "brightness(0.55)" }}
           />
