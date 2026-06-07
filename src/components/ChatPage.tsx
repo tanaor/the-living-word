@@ -7,8 +7,10 @@ import ChatInput from "./ChatInput";
 import LoadingDots from "./LoadingDots";
 import ConversationList from "./ConversationList";
 import DailyVerseCard from "./DailyVerseCard";
+import SuggestionChips from "./SuggestionChips";
 import { buildSystemPrompt } from "../prompts/system-prompt";
 import { sendChatMessage } from "../lib/gemini";
+import { extractChips } from "../lib/responseFormat";
 
 interface ChatPageProps {
   userId: string;
@@ -77,6 +79,13 @@ export default function ChatPage({ userId, userName, onSignOut }: ChatPageProps)
       );
     }
   }
+
+  const visibleMessages = messages.filter((m) => m.role !== "system");
+  const lastMessage = visibleMessages[visibleMessages.length - 1];
+  const latestChips =
+    lastMessage && lastMessage.role === "assistant"
+      ? extractChips(lastMessage.content).chips
+      : [];
 
   if (loading) {
     return (
@@ -175,11 +184,11 @@ export default function ChatPage({ userId, userName, onSignOut }: ChatPageProps)
               </div>
             )}
 
-            {messages
-              .filter((m) => m.role !== "system")
-              .map((msg) => (
-                <MessageBubble key={msg.id} role={msg.role as "user" | "assistant"} content={msg.content} />
-              ))}
+            {visibleMessages.map((msg) => (
+              <MessageBubble key={msg.id} role={msg.role as "user" | "assistant"} content={msg.content} />
+            ))}
+
+            <SuggestionChips chips={latestChips} onSelect={(c) => send(c)} disabled={sending} />
 
             {sending && (
               <div className="flex justify-start mb-3">
