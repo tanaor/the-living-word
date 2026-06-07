@@ -22,7 +22,6 @@ export type Segment = TextSegment | PrayerSegment;
 
 const MEMORY_RE = /\[MEMORY\]([\s\S]*?)\[\/MEMORY\]/i;
 const CHIPS_RE = /\[CHIPS\]([\s\S]*?)\[\/CHIPS\]/i;
-const PRAYER_RE = /\[PRAYER([^\]]*)\]([\s\S]*?)\[\/PRAYER\]/gi;
 
 /** Pull a `name="value"` attribute out of a raw attribute string. */
 function attr(raw: string, name: string): string {
@@ -70,12 +69,12 @@ export function extractChips(raw: string): { body: string; chips: string[] } {
 }
 
 export function parseSegments(body: string): Segment[] {
+  const prayerRe = /\[PRAYER([^\]]*)\]([\s\S]*?)\[\/PRAYER\]/gi;
   const segments: Segment[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;
-  PRAYER_RE.lastIndex = 0;
 
-  while ((match = PRAYER_RE.exec(body)) !== null) {
+  while ((match = prayerRe.exec(body)) !== null) {
     if (match.index > lastIndex) {
       const text = body.slice(lastIndex, match.index).trim();
       if (text) segments.push({ type: "text", content: text });
@@ -96,7 +95,7 @@ export function parseSegments(body: string): Segment[] {
       body: prayerBody,
     });
 
-    lastIndex = PRAYER_RE.lastIndex;
+    lastIndex = prayerRe.lastIndex;
   }
 
   if (lastIndex < body.length) {
