@@ -1,0 +1,8 @@
+project_id = "lxerylvpozlcghzvkbeh"
+
+# The chat function is a public proxy that holds the Anthropic API key
+# server-side. The frontend authenticates with the publishable anon key
+# (not a JWT), so gateway JWT verification must be disabled or every
+# request is rejected with UNAUTHORIZED_INVALID_JWT_FORMAT.
+[functions.chat]
+verify_jwt = false
