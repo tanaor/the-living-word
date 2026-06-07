@@ -33,33 +33,38 @@ export function useChat({
 
     setSending(true);
 
+    // Capture convId locally — prayer always forces a new conversation,
+    // so we can't rely on activeConversationId (stale closure after createConversation)
+    let convId: string | null = isPrayer ? null : activeConversationId;
+    const isFirstMessage = isPrayer || messages.length === 0;
+    // For prayer, start with a clean history regardless of prior conversation
+    const priorMessages = isPrayer
+      ? []
+      : messages
+          .filter((m) => m.role !== "system")
+          .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
+
     try {
-      const isFirstMessage = messages.length === 0;
-      let convId = activeConversationId;
       if (!convId) {
         convId = await createConversation(isPrayer);
       }
 
       await addMessage(convId, "user", userMessage);
 
-      // Name immediately from the user's own words
       if (isFirstMessage) {
         nameConversation(convId, userMessage);
       }
 
       const systemPrompt = buildSystemPrompt(userName, userContext ?? undefined);
-
       const chatHistory = [
-        ...messages.map((m) => ({ role: m.role as "user" | "assistant" | "system", content: m.content })),
+        ...priorMessages,
         { role: "user" as const, content: userMessage },
-      ].filter((m) => m.role !== "system") as Array<{ role: "user" | "assistant"; content: string }>;
+      ];
 
       const aiResponse = await sendChatMessage(chatHistory, systemPrompt);
-
       await addMessage(convId, "assistant", aiResponse);
     } catch (err) {
       console.error("Chat error:", err);
-      const convId = activeConversationId;
       if (convId) {
         await addMessage(
           convId,
