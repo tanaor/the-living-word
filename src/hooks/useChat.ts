@@ -70,11 +70,17 @@ export function useChat({
       // then strip the [MEMORY] block so it is never shown or re-applied.
       const { cleaned, memory } = extractMemory(aiResponse);
       if (memory) {
-        await updateUserContext({
-          ...(memory.life_season ? { life_season: memory.life_season } : {}),
-          ...(memory.faith_journey ? { faith_journey: memory.faith_journey } : {}),
-          ...(memory.key_topics ? { key_topics: memory.key_topics } : {}),
-        });
+        // Memory persistence is a best-effort side effect — never let a failed
+        // context write swallow the AI's actual reply.
+        try {
+          await updateUserContext({
+            ...(memory.life_season ? { life_season: memory.life_season } : {}),
+            ...(memory.faith_journey ? { faith_journey: memory.faith_journey } : {}),
+            ...(memory.key_topics ? { key_topics: memory.key_topics } : {}),
+          });
+        } catch (memErr) {
+          console.error("Failed to persist user context:", memErr);
+        }
       }
 
       await addMessage(convId, "assistant", cleaned);
