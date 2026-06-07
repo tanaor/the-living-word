@@ -48,6 +48,11 @@ describe("extractChips", () => {
     const raw = "[CHIPS]\n- First\n* Second\n[/CHIPS]";
     expect(extractChips(raw).chips).toEqual(["First", "Second"]);
   });
+
+  it("strips leading numbering from chip lines", () => {
+    const raw = "[CHIPS]\n1. First\n2) Second\n[/CHIPS]";
+    expect(extractChips(raw).chips).toEqual(["First", "Second"]);
+  });
 });
 
 describe("parseSegments", () => {
@@ -70,6 +75,20 @@ describe("parseSegments", () => {
       body: "Heavenly Father, give me peace. Amen.",
     });
     expect(segs[2]).toEqual({ type: "text", content: "Closing line." });
+  });
+
+  it("tolerates a longer dash run or trailing spaces in the separator", () => {
+    const raw =
+      '[PRAYER verse="Psalm 23:1"]\n"The Lord is my shepherd."\n---- \nLord, lead me. Amen.\n[/PRAYER]';
+    const segs = parseSegments(raw);
+    expect(segs[0]).toEqual({
+      type: "prayer",
+      label: "PRAYER",
+      verse: "Psalm 23:1",
+      translation: "",
+      verseText: "The Lord is my shepherd.",
+      body: "Lord, lead me. Amen.",
+    });
   });
 
   it("defaults label to PRAYER and tolerates a missing verse/body separator", () => {

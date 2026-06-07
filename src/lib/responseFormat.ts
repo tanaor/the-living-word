@@ -60,7 +60,7 @@ export function extractChips(raw: string): { body: string; chips: string[] } {
 
   const chips = match[1]
     .split("\n")
-    .map((l) => l.replace(/^[-*•]\s*/, "").trim())
+    .map((l) => l.replace(/^[-*•]\s*/, "").replace(/^\d+[.)]\s*/, "").trim())
     .filter(Boolean)
     .slice(0, 3);
 
@@ -82,7 +82,7 @@ export function parseSegments(body: string): Segment[] {
 
     const attrs = match[1];
     const inner = match[2].trim();
-    const parts = inner.split(/\n---\n/);
+    const parts = inner.split(/\n-{3,}[ \t]*\n/);
     const verseText = (parts[0] || "").trim().replace(/^"|"$/g, "");
     const prayerBody = (parts[1] || "").trim();
 
